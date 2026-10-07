@@ -5,205 +5,184 @@ import {
   EyeOff,
   Lock,
   Mail,
-  ShieldCheck,
   User,
-  ArrowRight,
   Sparkles,
+  ShieldCheck,
+  CheckCircle2,
+  ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { login, register } = useAuth();
 
-  const [portal, setPortal] = useState("user");
+  const [mode, setMode] = useState("login");
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const isLogin = mode === "login";
+
+  const switchMode = (newMode) => {
+    setMode(newMode);
+
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setError("");
+    setSuccess("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
+  // LOGIN
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (portal === "user") {
-      navigate("/user-dashboard");
-    } else {
-      navigate("/admin-dashboard");
+    setError("");
+    setSuccess("");
+
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter your email and password.");
+      return;
     }
+
+    const result = login(email, password);
+
+    if (!result.success) {
+      setError(result.message);
+      return;
+    }
+
+    navigate("/user-dashboard");
+  };
+
+  // CREATE ACCOUNT
+  const handleRegister = (e) => {
+    e.preventDefault();
+
+    setError("");
+    setSuccess("");
+
+    if (!name.trim()) {
+      setError("Please enter your full name.");
+      return;
+    }
+
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    if (!password) {
+      setError("Please create a password.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    const result = register({
+      name,
+      email,
+      password,
+    });
+
+    if (!result.success) {
+      setError(result.message);
+      return;
+    }
+
+    setSuccess("Account created successfully!");
+
+    setTimeout(() => {
+      navigate("/user-dashboard");
+    }, 700);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="min-h-screen bg-[#020617] px-4 py-10 text-white sm:py-14">
 
-        {/* LEFT SIDE */}
-        <div className="relative hidden overflow-hidden lg:flex">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-blue-600/10 to-slate-950" />
+      <div className="mx-auto w-full max-w-md">
 
-          <div className="relative z-10 flex w-full flex-col justify-between p-12">
+        {/* LOGO */}
+        <div className="mb-8 text-center">
 
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/20">
-                <Eye size={24} />
-              </div>
-
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  RetinaCare AI
-                </h1>
-                <p className="text-xs text-slate-400">
-                  Intelligent Screening Platform
-                </p>
-              </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="max-w-xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300">
-                <Sparkles size={16} />
-                AI Powered Healthcare
-              </div>
-
-              <h2 className="text-5xl font-bold leading-tight tracking-tight xl:text-6xl">
-                Smarter retinal
-                <span className="block text-cyan-400">
-                  screening.
-                </span>
-                Better care.
-              </h2>
-
-              <p className="mt-6 max-w-lg text-lg leading-8 text-slate-400">
-                An intelligent diabetic retinopathy screening platform that
-                combines retinal image analysis with AI-assisted risk
-                assessment.
-              </p>
-
-              {/* Features */}
-              <div className="mt-10 grid gap-5">
-
-                <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/5">
-                    <Brain className="text-cyan-400" size={22} />
-                  </div>
-
-                  <div>
-                    <p className="font-semibold">AI-Powered Analysis</p>
-                    <p className="text-sm text-slate-500">
-                      Advanced image-based retinal screening.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/5">
-                    <ShieldCheck className="text-cyan-400" size={22} />
-                  </div>
-
-                  <div>
-                    <p className="font-semibold">Secure Patient Data</p>
-                    <p className="text-sm text-slate-500">
-                      Designed with privacy and secure access in mind.
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center gap-3 text-sm text-slate-500">
-              <span>© 2026 RetinaCare AI</span>
-              <span>•</span>
-              <span>Clinical Decision Support</span>
-            </div>
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10">
+            <Brain
+              size={28}
+              className="text-cyan-400"
+            />
           </div>
+
+          <h1 className="text-3xl font-bold">
+            NETRA AI
+          </h1>
+
+          <p className="mt-2 text-sm text-slate-400">
+            AI-powered retinal health screening
+          </p>
         </div>
 
-        {/* RIGHT SIDE */}
-        <div className="flex items-center justify-center bg-slate-900 px-6 py-12">
-          <div className="w-full max-w-md">
+        {/* CARD */}
+        <div className="rounded-3xl border border-slate-800/80 bg-[#0a1020] p-6 shadow-2xl sm:p-7">
 
-            {/* Mobile Logo */}
-            <div className="mb-10 flex items-center gap-3 lg:hidden">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400 text-slate-950">
-                <Eye size={24} />
-              </div>
+          {/* HEADER */}
+          <div className="mb-6">
 
-              <div>
-                <h1 className="text-xl font-bold">
-                  RetinaCare AI
-                </h1>
-                <p className="text-xs text-slate-500">
-                  Intelligent Screening Platform
-                </p>
-              </div>
-            </div>
+            <h2 className="text-2xl font-bold">
+              {isLogin
+                ? "Welcome Back"
+                : "Create New Account"}
+            </h2>
 
-            {/* Heading */}
-            <div className="mb-8">
-              <p className="mb-3 text-sm font-medium text-cyan-400">
-                Welcome back
-              </p>
+            <p className="mt-1 text-sm text-slate-400">
+              {isLogin
+                ? "Sign in to continue to your dashboard"
+                : "Enter your details to create your NETRA AI account"}
+            </p>
+          </div>
 
-              <h2 className="text-3xl font-bold">
-                Sign in to your workspace
-              </h2>
+          {/* LOGIN */}
+          {isLogin ? (
+            <form
+              onSubmit={handleLogin}
+              className="space-y-5"
+            >
 
-              <p className="mt-2 text-sm text-slate-500">
-                Select your portal and continue securely.
-              </p>
-            </div>
-
-            {/* Portal Switch */}
-            <div className="mb-7 grid grid-cols-2 rounded-xl border border-slate-700 bg-slate-950 p-1">
-
-              <button
-                type="button"
-                onClick={() => setPortal("user")}
-                className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition ${
-                  portal === "user"
-                    ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/10"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                <User size={17} />
-                User Portal
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPortal("admin")}
-                className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition ${
-                  portal === "admin"
-                    ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/10"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                <ShieldCheck size={17} />
-                Admin Portal
-              </button>
-
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleLogin} className="space-y-5">
-
-              {/* Email */}
+              {/* EMAIL */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-300">
-                  Email address
+                  Email Address
                 </label>
 
                 <div className="relative">
+
                   <Mail
                     size={18}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
@@ -211,42 +190,51 @@ function Login() {
 
                   <input
                     type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="doctor@example.com"
-                    required
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3.5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/10"
+                    value={email}
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
+                    placeholder="you@example.com"
+                    className="w-full rounded-xl border border-slate-700 bg-[#020617] py-3.5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-500"
                   />
                 </div>
               </div>
 
-              {/* Password */}
+              {/* PASSWORD */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-300">
                   Password
                 </label>
 
                 <div className="relative">
+
                   <Lock
                     size={18}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
                   />
 
                   <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
+                    value={password}
+                    onChange={(e) =>
+                      setPassword(e.target.value)
+                    }
                     placeholder="Enter your password"
-                    required
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3.5 pl-11 pr-12 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/10"
+                    className="w-full rounded-xl border border-slate-700 bg-[#020617] py-3.5 pl-11 pr-12 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-500"
                   />
 
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-white"
+                    onClick={() =>
+                      setShowPassword(
+                        (prev) => !prev
+                      )
+                    }
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
                   >
                     {showPassword ? (
                       <EyeOff size={18} />
@@ -257,34 +245,255 @@ function Login() {
                 </div>
               </div>
 
-              {/* Login */}
+              {/* ERROR */}
+              {error && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
+
+              {/* SIGN IN */}
               <button
                 type="submit"
-                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 py-3.5 font-semibold text-slate-950 transition hover:bg-cyan-300 hover:shadow-lg hover:shadow-cyan-400/20"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
               >
-                {portal === "user"
-                  ? "Sign in as User"
-                  : "Sign in as Admin"}
-
-                <ArrowRight
-                  size={18}
-                  className="transition-transform group-hover:translate-x-1"
-                />
+                <Sparkles size={17} />
+                Sign In
               </button>
-
             </form>
+          ) : (
 
-            {/* Security */}
-            <div className="mt-7 flex items-center justify-center gap-2 text-xs text-slate-500">
-              <ShieldCheck size={15} className="text-cyan-400" />
-              <span>Secure access</span>
-              <span>•</span>
-              <span>Protected healthcare environment</span>
-            </div>
+            /* CREATE ACCOUNT */
+            <form
+              onSubmit={handleRegister}
+              className="space-y-4"
+            >
 
+              {/* NAME */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">
+                  Full Name
+                </label>
+
+                <div className="relative">
+
+                  <User
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                  />
+
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) =>
+                      setName(e.target.value)
+                    }
+                    placeholder="Saksham Arya"
+                    className="w-full rounded-xl border border-slate-700 bg-[#020617] py-3.5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-500"
+                  />
+                </div>
+              </div>
+
+              {/* EMAIL */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">
+                  Email Address
+                </label>
+
+                <div className="relative">
+
+                  <Mail
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                  />
+
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
+                    placeholder="saksham@example.com"
+                    className="w-full rounded-xl border border-slate-700 bg-[#020617] py-3.5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-500"
+                  />
+                </div>
+              </div>
+
+              {/* PASSWORD */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">
+                  Password
+                </label>
+
+                <div className="relative">
+
+                  <Lock
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                  />
+
+                  <input
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
+                    value={password}
+                    onChange={(e) =>
+                      setPassword(e.target.value)
+                    }
+                    placeholder="Minimum 6 characters"
+                    className="w-full rounded-xl border border-slate-700 bg-[#020617] py-3.5 pl-11 pr-12 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-500"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPassword(
+                        (prev) => !prev
+                      )
+                    }
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* CONFIRM PASSWORD */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">
+                  Confirm Password
+                </label>
+
+                <div className="relative">
+
+                  <Lock
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                  />
+
+                  <input
+                    type={
+                      showConfirmPassword
+                        ? "text"
+                        : "password"
+                    }
+                    value={confirmPassword}
+                    onChange={(e) =>
+                      setConfirmPassword(
+                        e.target.value
+                      )
+                    }
+                    placeholder="Re-enter your password"
+                    className="w-full rounded-xl border border-slate-700 bg-[#020617] py-3.5 pl-11 pr-12 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-500"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowConfirmPassword(
+                        (prev) => !prev
+                      )
+                    }
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* PASSWORD INFO */}
+              <div className="flex items-center gap-2 rounded-xl border border-cyan-500/10 bg-cyan-500/5 px-3 py-2.5">
+                <ShieldCheck
+                  size={15}
+                  className="shrink-0 text-cyan-400"
+                />
+
+                <p className="text-[11px] leading-5 text-slate-400">
+                  Password must contain at least 6 characters.
+                </p>
+              </div>
+
+              {/* ERROR */}
+              {error && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
+
+              {/* SUCCESS */}
+              {success && (
+                <div className="flex items-start gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+                  <CheckCircle2
+                    size={17}
+                    className="mt-0.5 shrink-0"
+                  />
+
+                  <span>{success}</span>
+                </div>
+              )}
+
+              {/* CREATE */}
+              <button
+                type="submit"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+              >
+                <Sparkles size={17} />
+                Create Account
+              </button>
+            </form>
+          )}
+
+          {/* -------------------------------- */}
+          {/* ACCOUNT SWITCH */}
+          {/* -------------------------------- */}
+
+          <div className="mt-6 border-t border-slate-800 pt-5 text-center">
+
+            {isLogin ? (
+              <p className="text-sm text-slate-500">
+                Don't have an account?{" "}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    switchMode("register")
+                  }
+                  className="font-semibold text-cyan-400 hover:text-cyan-300"
+                >
+                  Create New Account
+                </button>
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  switchMode("login")
+                }
+                className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-400 hover:text-cyan-300"
+              >
+                <ArrowLeft size={15} />
+                Back to Sign In
+              </button>
+            )}
           </div>
-        </div>
 
+          {/* SECURITY */}
+          <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-slate-600">
+            <Eye size={13} />
+            Secure NETRA AI Environment
+          </div>
+
+        </div>
       </div>
     </div>
   );

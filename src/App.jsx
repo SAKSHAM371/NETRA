@@ -25,25 +25,16 @@ import NotFound from "./pages/NotFound";
 function App() {
   return (
     <Routes>
-      {/* Default */}
-      <Route
-        path="/"
-        element={<Navigate to="/login" replace />}
-      />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Authentication */}
       <Route path="/login" element={<Login />} />
 
-      {/* User Routes */}
       <Route
         path="/user-dashboard"
         element={<UserDashboard />}
       />
 
-      <Route
-        path="/screenings"
-        element={<Screenings />}
-      />
+      <Route path="/screenings" element={<Screenings />} />
 
       <Route
         path="/upload-screening"
@@ -55,10 +46,7 @@ function App() {
         element={<ScreeningDetails />}
       />
 
-      <Route
-        path="/reports"
-        element={<Reports />}
-      />
+      <Route path="/reports" element={<Reports />} />
 
       <Route
         path="/recommendations"
@@ -75,21 +63,11 @@ function App() {
         element={<HelpSupport />}
       />
 
-      <Route
-        path="/profile"
-        element={<Profile />}
-      />
+      <Route path="/profile" element={<Profile />} />
 
-      <Route
-        path="/settings"
-        element={<Settings />}
-      />
+      <Route path="/settings" element={<Settings />} />
 
-      {/* Admin Routes */}
-      <Route
-        path="/patients"
-        element={<Patients />}
-      />
+      <Route path="/patients" element={<Patients />} />
 
       <Route
         path="/patients/:id"
@@ -106,16 +84,9 @@ function App() {
         element={<UrgentCases />}
       />
 
-      <Route
-        path="/analytics"
-        element={<Analytics />}
-      />
+      <Route path="/analytics" element={<Analytics />} />
 
-      {/* 404 */}
-      <Route
-        path="*"
-        element={<NotFound />}
-      />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
